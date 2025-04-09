@@ -37,7 +37,7 @@ void Cosmology::Load_Scale_Outputs(struct Parameters *P)
   int scale_indx = next_output_indx;
   a_value        = scale_outputs[scale_indx];
 
-  while ((current_a - a_value) > 1e-3) {
+  while ((a_value - current_value) < 1e-3) {
     // chprintf( "%f   %f\n", a_value, current_a);
     scale_indx += 1;
     a_value = scale_outputs[scale_indx];
