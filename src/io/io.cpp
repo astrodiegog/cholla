@@ -659,6 +659,9 @@ void Grid3D::Write_Header_HDF5(hid_t file_id)
   status = Write_HDF5_Attribute(file_id, dataspace_id, &Cosmo.H0, "H0");
   status = Write_HDF5_Attribute(file_id, dataspace_id, &Cosmo.Omega_M, "Omega_M");
   status = Write_HDF5_Attribute(file_id, dataspace_id, &Cosmo.Omega_L, "Omega_L");
+  status = Write_HDF5_Attribute(file_id, dataspace_id, &Cosmo.Omega_R, "Omega_R");
+  status = Write_HDF5_Attribute(file_id, dataspace_id, &Cosmo.Omega_K, "Omega_K");
+  status = Write_HDF5_Attribute(file_id, dataspace_id, &Cosmo.Omega_b, "Omega_b");
   status = Write_HDF5_Attribute(file_id, dataspace_id, &Cosmo.current_z, "Current_z");
   status = Write_HDF5_Attribute(file_id, dataspace_id, &Cosmo.current_a, "Current_a");
   #endif
