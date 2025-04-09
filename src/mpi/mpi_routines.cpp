@@ -155,7 +155,7 @@ void InitializeChollaMPI(int *pargc, char **pargv[])
   MPI_Comm_size(MPI_COMM_WORLD, &nproc);
 
   /*print a cute message*/
-  // printf("Processor %d of %d: Hello!\n", procID, nproc);
+   printf("Processor %d of %d: Hello!\n", procID, nproc);
 
   /* set the root process rank */
   root = 0;
