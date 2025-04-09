@@ -126,6 +126,13 @@ int main(int argc, char *argv[])
     nfile = P.nfile;
   }
 
+#if defined(PRINT_INITIAL_STATS) && defined(COSMOLOGY)
+  chprintf("--- Printing cool stats! ---\n");
+  Print_Stats(G);
+  chprintf("--- Done w/cool stats! ---\n\n\n");
+#endif // PRINT_INITIAL_STATS, PRINT_INITIAL_STATS
+
+
 #ifdef DE
   chprintf("\nUsing Dual Energy Formalism:\n eta_1: %0.3f   eta_2: %0.4f\n", DE_ETA_1, DE_ETA_2);
   message = " eta_1: " + std::to_string(DE_ETA_1) + "   eta_2: " + std::to_string(DE_ETA_2);
@@ -148,6 +155,12 @@ int main(int argc, char *argv[])
   G.Initialize_Cosmology(&P);
 #endif
 
+#if defined(PRINT_INITIAL_STATS) && defined(COSMOLOGY)
+  chprintf("--- Printing cool stats! ---\n");
+  Print_Stats(G);
+  chprintf("--- Done w/cool stats! ---\n\n\n");
+#endif // PRINT_INITIAL_STATS, PRINT_INITIAL_STATS
+
 #ifdef COOLING_GRACKLE
   G.Initialize_Grackle(&P);
 #endif
@@ -155,6 +168,12 @@ int main(int argc, char *argv[])
 #ifdef CHEMISTRY_GPU
   G.Initialize_Chemistry(&P);
 #endif
+
+#if defined(PRINT_INITIAL_STATS) && defined(COSMOLOGY)
+  chprintf("--- Printing cool stats! ---\n");
+  Print_Stats(G);
+  chprintf("--- Done w/cool stats! ---\n\n\n");
+#endif // PRINT_INITIAL_STATS, PRINT_INITIAL_STATS
 
 #ifdef ANALYSIS
   G.Initialize_AnalysisModule(&P);
@@ -248,6 +267,12 @@ int main(int argc, char *argv[])
   // Compute inverse timestep for the first time
   dti = G.Calc_Inverse_Timestep();
 
+#if defined(PRINT_INITIAL_STATS) && defined(COSMOLOGY)
+  chprintf("--- Printing cool stats! ---\n");
+  Print_Stats(G);
+  chprintf("--- Done w/cool stats! ---\n\n\n");
+#endif // PRINT_INITIAL_STATS, PRINT_INITIAL_STATS
+
   while (G.H.t < P.tout) {
 // get the start time
 #ifdef CPU_TIME
@@ -329,6 +354,12 @@ int main(int argc, char *argv[])
         G.H.n_step, G.H.t, G.H.dt, (stop_step - start_step) * 1000, G.H.t_wall);
 
     if (P.output_always) G.H.Output_Now = true;
+
+#if defined(PRINT_INITIAL_STATS) && defined(COSMOLOGY)
+  chprintf("--- Printing cool stats! ---\n");
+  Print_Stats(G);
+  chprintf("--- Done w/cool stats! ---\n\n\n");
+#endif // PRINT_INITIAL_STATS, PRINT_INITIAL_STATS
 
 #ifdef ANALYSIS
     if (G.Analysis.Output_Now) G.Compute_and_Output_Analysis(&P);
