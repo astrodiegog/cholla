@@ -2499,6 +2499,264 @@ void Read_Grid_HDF5_Field_Magnetic(hid_t file_id, Real *dataset_buffer, Header H
                              dataset_buffer, grid_buffer);
 }
 
+  #if defined(PRINT_INITIAL_STATS) && defined(COSMOLOGY)
+/*! \fn void Print_Stats(Grid3D &G)
+ *  *  \brief Compute stats for a grid. */
+void Print_Stats(Grid3D &G)
+{
+  // Synchronize
+  cudaMemcpy(G.C.density, G.C.device, G.H.n_fields * G.H.n_cells * sizeof(Real), cudaMemcpyDeviceToHost);
+  // Write data
+  G.Print_Grid_Stats();
+}
+
+/*! \fn void Print_Grid_Stats(void)
+ *  *  \brief Compute stats for grid properties. */
+void Grid3D::Print_Grid_Stats(void)
+{
+  int i, j, k, id, buf_id;
+  Real mean_l, min_l, max_l;
+  Real mean_g, min_g, max_g;
+
+  // Print several interesting numbers
+
+  // Density stats
+  mean_l = 0;
+  min_l  = 1e65;
+  max_l  = -1;
+  // Do density first
+  for (k = 0; k < H.nz_real; k++) {
+    for (j = 0; j < H.ny_real; j++) {
+      for (i = 0; i < H.nx_real; i++) {
+        id     = (i + H.n_ghost) + (j + H.n_ghost) * H.nx + (k + H.n_ghost) * H.nx * H.ny;
+        buf_id = k + j * (H.nz_real) + i * (H.nz_real) * (H.ny_real);
+        mean_l += C.density[id];
+        max_l = std::max(max_l, C.density[id]);
+        min_l = std::min(min_l, C.density[id]);
+      }
+    }
+  }
+  mean_l /= ((H.nz_real) * (H.ny_real) * (H.nx_real));
+
+    #if MPI_CHOLLA
+  mean_g = ReduceRealAvg(mean_l);
+  max_g  = ReduceRealMax(max_l);
+  min_g  = ReduceRealMin(min_l);
+  mean_l = mean_g;
+  max_l  = max_g;
+  min_l  = min_g;
+    #endif  // MPI_CHOLLA
+  chprintf("Density  Mean: %f   Min: %f   Max: %f      [ h^2 Msun kpc^-3] \n", mean_l, min_l, max_l);
+
+  // Momentum stats
+
+  // x momenta
+   mean_l = 0;
+  min_l  = 1e65;
+  max_l  = -1;
+  for (k = 0; k < H.nz_real; k++) {
+    for (j = 0; j < H.ny_real; j++) {
+      for (i = 0; i < H.nx_real; i++) {
+        id     = (i + H.n_ghost) + (j + H.n_ghost) * H.nx + (k + H.n_ghost) * H.nx * H.ny;
+        buf_id = k + j * (H.nz_real) + i * (H.nz_real) * (H.ny_real);
+        mean_l += std::abs(C.momentum_x[id]);
+        max_l = std::max(max_l, std::abs(C.momentum_x[id]));
+        min_l = std::min(min_l, std::abs(C.momentum_x[id]));
+      }
+    }
+  }
+  mean_l /= ((H.nz_real) * (H.ny_real) * (H.nx_real));
+
+    #if MPI_CHOLLA
+  mean_g = ReduceRealAvg(mean_l);
+  max_g  = ReduceRealMax(max_l);
+  min_g  = ReduceRealMin(min_l);
+  mean_l = mean_g;
+  max_l  = max_g;
+  min_l  = min_g;
+    #endif  // MPI_CHOLLA
+  chprintf(" abs(Momentum X)  Mean: %f   Min: %f   Max: %f      [ h^2 Msun kpc^-3 km s^-1] \n", mean_l, min_l, max_l);
+
+  // y momenta
+    mean_l = 0;
+  min_l  = 1e65;
+  max_l  = -1;
+  for (k = 0; k < H.nz_real; k++) {
+    for (j = 0; j < H.ny_real; j++) {
+      for (i = 0; i < H.nx_real; i++) {
+        id     = (i + H.n_ghost) + (j + H.n_ghost) * H.nx + (k + H.n_ghost) * H.nx * H.ny;
+        buf_id = k + j * (H.nz_real) + i * (H.nz_real) * (H.ny_real);
+        mean_l += std::abs(C.momentum_y[id]);
+        max_l = std::max(max_l, std::abs(C.momentum_y[id]));
+        min_l = std::min(min_l, std::abs(C.momentum_y[id]));
+      }
+    }
+  }
+  mean_l /= ((H.nz_real) * (H.ny_real) * (H.nx_real));
+
+    #if MPI_CHOLLA
+  mean_g = ReduceRealAvg(mean_l);
+  max_g  = ReduceRealMax(max_l);
+  min_g  = ReduceRealMin(min_l);
+  mean_l = mean_g;
+  max_l  = max_g;
+  min_l  = min_g;
+    #endif  // MPI_CHOLLA
+  chprintf(" abs(Momentum Y)  Mean: %f   Min: %f   Max: %f      [ h^2 Msun kpc^-3 km s^-1] \n", mean_l, min_l, max_l);
+
+
+  // z momenta
+  mean_l = 0;
+  min_l  = 1e65;
+  max_l  = -1;
+  for (k = 0; k < H.nz_real; k++) {
+    for (j = 0; j < H.ny_real; j++) {
+      for (i = 0; i < H.nx_real; i++) {
+        id     = (i + H.n_ghost) + (j + H.n_ghost) * H.nx + (k + H.n_ghost) * H.nx * H.ny;
+        buf_id = k + j * (H.nz_real) + i * (H.nz_real) * (H.ny_real);
+        mean_l += std::abs(C.momentum_z[id]);
+        max_l = std::max(max_l, std::abs(C.momentum_z[id]));
+        min_l = std::min(min_l, std::abs(C.momentum_z[id]));
+      }
+    }
+  }
+  mean_l /= ((H.nz_real) * (H.ny_real) * (H.nx_real));
+
+    #if MPI_CHOLLA
+  mean_g = ReduceRealAvg(mean_l);
+  max_g  = ReduceRealMax(max_l);
+  min_g  = ReduceRealMin(min_l);
+  mean_l = mean_g;
+  max_l  = max_g;
+  min_l  = min_g;
+    #endif  // MPI_CHOLLA
+  chprintf(" abs(Momentum Z)  Mean: %f   Min: %f   Max: %f      [ h^2 Msun kpc^-3 km s^-1] \n", mean_l, min_l, max_l);
+
+  // Energy
+  mean_l = 0;
+  min_l  = 1e65;
+  max_l  = -1;
+  for (k = 0; k < H.nz_real; k++) {
+    for (j = 0; j < H.ny_real; j++) {
+      for (i = 0; i < H.nx_real; i++) {
+        id     = (i + H.n_ghost) + (j + H.n_ghost) * H.nx + (k + H.n_ghost) * H.nx * H.ny;
+        buf_id = k + j * (H.nz_real) + i * (H.nz_real) * (H.ny_real);
+        mean_l += C.Energy[id];
+        max_l = std::max(max_l, C.Energy[id]);
+        min_l = std::min(min_l, C.Energy[id]);
+      }
+    }
+  }
+  mean_l /= ((H.nz_real) * (H.ny_real) * (H.nx_real));
+
+    #if MPI_CHOLLA
+  mean_g = ReduceRealAvg(mean_l);
+  max_g  = ReduceRealMax(max_l);
+  min_g  = ReduceRealMin(min_l);
+  mean_l = mean_g;
+  max_l  = max_g;
+  min_l  = min_g;
+    #endif  // MPI_CHOLLA
+  chprintf(" Energy  Mean: %f   Min: %f   Max: %f      [ h^2 Msun kpc^-3 km^2 s^-2 ]\n", mean_l, min_l, max_l);
+
+  Real temp, temp_max_l, temp_min_l, temp_mean_l;
+  Real temp_min_g, temp_max_g, temp_mean_g;
+  Real gase, vx, vy, vz;
+  temp_mean_l = 0;
+  temp_min_l  = 1e65;
+  temp_max_l  = -1;
+  mean_l      = 0;
+  min_l       = 1e65;
+  max_l       = -1;
+  for (k = 0; k < H.nz_real; k++) {
+    for (j = 0; j < H.ny_real; j++) {
+      for (i = 0; i < H.nx_real; i++) {
+        id     = (i + H.n_ghost) + (j + H.n_ghost) * H.nx + (k + H.n_ghost) * H.nx * H.ny;
+        buf_id = k + j * (H.nz_real) + i * (H.nz_real) * (H.ny_real);
+        vx     = C.momentum_x[id] / C.density[id];
+        vy     = C.momentum_y[id] / C.density[id];
+        vz     = C.momentum_z[id] / C.density[id];
+        gase   = C.Energy[id] - 0.5 * C.density[id] * (vx * vx + vy * vy + vz * vz);
+        mean_l += gase;
+        max_l = std::max(max_l, gase);
+        min_l = std::min(min_l, gase);
+
+        temp = gase / C.density[id] * (gama - 1) * MP / KB * 1e10;
+        temp_mean_l += temp;
+        temp_max_l = std::max(temp_max_l, temp);
+        temp_min_l = std::min(temp_min_l, temp);
+      }
+    }
+  }
+  mean_l /= (H.nz_real * H.ny_real * H.nx_real);
+  temp_mean_l /= (H.nz_real * H.ny_real * H.nx_real);
+
+    #if MPI_CHOLLA
+  mean_g      = ReduceRealAvg(mean_l);
+  max_g       = ReduceRealMax(max_l);
+  min_g       = ReduceRealMin(min_l);
+  mean_l      = mean_g;
+  max_l       = max_g;
+  min_l       = min_g;
+  temp_mean_g = ReduceRealAvg(temp_mean_l);
+  temp_max_g  = ReduceRealMax(temp_max_l);
+  temp_min_g  = ReduceRealMin(temp_min_l);
+  temp_mean_l = temp_mean_g;
+  temp_max_l  = temp_max_g;
+  temp_min_l  = temp_min_g;
+    #endif  // MPI_CHOLLA
+
+  chprintf(" GasEnergyCalc  Mean: %f   Min: %f   Max: %f      [ h^2 Msun kpc^-3 km^2 s^-2 ] \n", mean_l, min_l, max_l);
+  chprintf(" TemperatureCalc  Mean: %f   Min: %f   Max: %f      [ K ] \n", temp_mean_l, temp_min_l, temp_max_l);
+
+    #ifdef DE
+  temp_mean_l = 0;
+  temp_min_l  = 1e65;
+  temp_max_l  = -1;
+  mean_l      = 0;
+  min_l       = 1e65;
+  max_l       = -1;
+  for (k = 0; k < H.nz_real; k++) {
+    for (j = 0; j < H.ny_real; j++) {
+      for (i = 0; i < H.nx_real; i++) {
+        id     = (i + H.n_ghost) + (j + H.n_ghost) * H.nx + (k + H.n_ghost) * H.nx * H.ny;
+        buf_id = k + j * (H.nz_real) + i * (H.nz_real) * (H.ny_real);
+        mean_l += C.GasEnergy[id];
+        max_l = std::max(max_l, C.GasEnergy[id]);
+        min_l = std::min(min_l, C.GasEnergy[id]);
+
+        temp = C.GasEnergy[id] / C.density[id] * (gama - 1) * MP / KB * 1e10;
+        temp_mean_l += temp;
+        temp_max_l = std::max(temp_max_l, temp);
+        temp_min_l = std::min(temp_min_l, temp);
+      }
+    }
+  }
+  mean_l /= (H.nz_real * H.ny_real * H.nx_real);
+  temp_mean_l /= (H.nz_real * H.ny_real * H.nx_real);
+
+      #if MPI_CHOLLA
+  mean_g      = ReduceRealAvg(mean_l);
+  max_g       = ReduceRealMax(max_l);
+  min_g       = ReduceRealMin(min_l);
+  mean_l      = mean_g;
+  max_l       = max_g;
+  min_l       = min_g;
+  temp_mean_g = ReduceRealAvg(temp_mean_l);
+  temp_max_g  = ReduceRealMax(temp_max_l);
+  temp_min_g  = ReduceRealMin(temp_min_l);
+  temp_mean_l = temp_mean_g;
+  temp_max_l  = temp_max_g;
+  temp_min_l  = temp_min_g;
+      #endif  // MPI_CHOLLA
+
+  chprintf(" GasEnergyDE  Mean: %f   Min: %f   Max: %f      [ h^2 Msun kpc^-3 km^2 s^-2 ] \n", mean_l, min_l, max_l);
+  chprintf(" TemperatureDE  Mean: %f   Min: %f   Max: %f      [ K ] \n", temp_mean_l, temp_min_l, temp_max_l);
+    #endif  // DE
+}
+  #endif  // PRINT_INITIAL_STATS and COSMOLOGY
+
+
 /*! \fn void Read_Grid_HDF5(hid_t file_id)
  *  \brief Read in grid data from an hdf5 file. */
 void Grid3D::Read_Grid_HDF5(hid_t file_id, struct Parameters P)
