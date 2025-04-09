@@ -1055,7 +1055,7 @@ void Grid3D::Compute_Transmitted_Flux_Skewer(int skewer_id, int axis)
     tau_HeII_i *= Lya_sigma_HeII;
     if (print_skewinfo)
     {
-      chprintf("\t tau [%d] = %10f \n", i tau_HI_i);
+      chprintf("\t tau [%d] = %10f \n", i, tau_HI_i);
     }
     full_optical_depth_HI[i]   = tau_HI_i;
     full_optical_depth_HeII[i] = tau_HeII_i;
