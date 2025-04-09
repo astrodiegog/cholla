@@ -498,6 +498,9 @@ void Grid3D::Compute_Flux_Power_Spectrum_Skewer(int skewer_id, int axis)
   Real *ps_root;
   Real *skewers_transmitted_flux;
 
+  bool print_skewinfo;
+  print_skewinfo = false;
+
   if (axis == 0) {
     am_I_root                = Analysis.am_I_root_x;
     n_los                    = Analysis.nx_total;
@@ -515,6 +518,10 @@ void Grid3D::Compute_Flux_Power_Spectrum_Skewer(int skewer_id, int axis)
     hist_n                   = Analysis.hist_n_x;
     ps_root                  = Analysis.ps_root_x;
     skewers_transmitted_flux = Analysis.skewers_transmitted_flux_HI_x;
+    if (skewer_id == 0)
+    {
+      print_skewinfo = true;
+    }
   }
 
   if (axis == 1) {
@@ -566,7 +573,10 @@ void Grid3D::Compute_Flux_Power_Spectrum_Skewer(int skewer_id, int axis)
 
   for (int los_id = 0; los_id < n_los; los_id++) {
     delta_F[los_id] = skewers_transmitted_flux[skewer_id * n_los + los_id] / Analysis.Flux_mean_HI;
-  }
+    if (print_skewinfo)
+    {
+      chprintf("\n\t F [%d] = %10f  & dF [%d] = %10f \n", los_id, skewers_transmitted_flux[skewer_id * n_los + los_id] , los_id, delta_F[los_id]);
+    }
 
   // Compute the r2c FFT
   fftw_execute(fftw_plan);
@@ -596,6 +606,10 @@ void Grid3D::Compute_Flux_Power_Spectrum_Skewer(int skewer_id, int axis)
     k_val = k_vals[i];
     if (k_val == 0) continue;
     bin_id = Locate_Index(k_val, hist_k_edges, n_hist_edges);
+    if (print_skewinfo) 
+    { 
+      chprintf(" fftid:  %d    bin id: %d    histkedge : %e    kval:  %e     fft2: %e \n", i, bin_id, hist_k_edges[bin_id], k_val, fft2_delta_F[i]);
+    }
     if (bin_id < 0) chprintf(" %d:   %e    %e   %e \n", bin_id, hist_k_edges[0], k_val, hist_k_edges[1]);
     if (bin_id < 0 || bin_id >= n_bins) continue;
     hist_PS[bin_id] += fft2_delta_F[i];
@@ -614,6 +628,10 @@ void Grid3D::Compute_Flux_Power_Spectrum_Skewer(int skewer_id, int axis)
       PS_bin_val = 0;
     else
       PS_bin_val = hist_PS[i] / hist_n[i] * (H * L_proper);
+    if (print_skewinfo)
+    {
+      chprintf("binid : %d   histn: %e  histPS: %e \n", i, hist_n[i], PS_bin_val);
+    }
     ps_root[i] += PS_bin_val;
   }
 
@@ -861,6 +879,9 @@ void Grid3D::Compute_Transmitted_Flux_Skewer(int skewer_id, int axis)
   Real *skewers_temperature_root;
   Real Lbox, delta_x;
 
+  bool print_skewinfo;
+  print_skewinfo = false;
+
   n_ghost = Analysis.n_ghost_skewer;
 
   if (axis == 0) {
@@ -882,6 +903,10 @@ void Grid3D::Compute_Transmitted_Flux_Skewer(int skewer_id, int axis)
     skewers_temperature_root      = Analysis.skewers_temperature_root_x;
     skewers_transmitted_flux_HI   = Analysis.skewers_transmitted_flux_HI_x;
     skewers_transmitted_flux_HeII = Analysis.skewers_transmitted_flux_HeII_x;
+    if (skewer_id == 0)
+    {
+      print_skewinfo = true;
+    }
   }
 
   if (axis == 1) {
@@ -998,6 +1023,12 @@ void Grid3D::Compute_Transmitted_Flux_Skewer(int skewer_id, int axis)
   Lya_sigma_HI   = M_PI * e_charge * e_charge / Me / c * Lya_lambda_HI * f_12 / H_cgs;
   Lya_sigma_HeII = M_PI * e_charge * e_charge / Me / c * Lya_lambda_HeII * f_12 / H_cgs;
 
+  if (print_skewinfo)
+  {
+    chprintf("dvHubble (cgs): %f \n", dv_Hubble);
+    chprintf("Lya sigmaHI (cgs): %f \n", Lya_sigma_HI);
+  }
+
   // Compute the optical depth
   Real b_HI_j, n_HI_j;
   Real b_HeII_j, n_HeII_j;
@@ -1022,6 +1053,10 @@ void Grid3D::Compute_Transmitted_Flux_Skewer(int skewer_id, int axis)
     }
     tau_HI_i *= Lya_sigma_HI;
     tau_HeII_i *= Lya_sigma_HeII;
+    if (print_skewinfo)
+    {
+      chprintf("\t tau [%d] = %10f \n", i tau_HI_i);
+    }
     full_optical_depth_HI[i]   = tau_HI_i;
     full_optical_depth_HeII[i] = tau_HeII_i;
   }
