@@ -1378,8 +1378,8 @@ void AnalysisModule::Initialize_Lya_Statistics(struct Parameters *P)
 {
   chprintf(" Initializing Lya Statistics...\n");
 
-  n_ghost_skewer = max(nx_total, ny_total);
-  n_ghost_skewer = max(nz_total, n_ghost_skewer);
+  n_ghost_skewer = std::max(nx_total, ny_total);
+  n_ghost_skewer = std::max(nz_total, n_ghost_skewer);
   n_ghost_skewer = 0.1 * n_ghost_skewer;
   n_los_full_x   = nx_total + 2 * n_ghost_skewer;
   n_los_full_y   = ny_total + 2 * n_ghost_skewer;

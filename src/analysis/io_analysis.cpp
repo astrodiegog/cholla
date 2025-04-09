@@ -683,7 +683,7 @@ void AnalysisModule::Load_Scale_Outputs(struct Parameters *P)
   chprintf(" Loading Analysis Scale_Factor Outpus: %s\n", filename_1);
 
   std::ifstream file_out(filename_1);
-  string line;
+  std::string line;
   Real a_value, current_a;
   if (file_out.is_open()) {
     while (getline(file_out, line)) {
