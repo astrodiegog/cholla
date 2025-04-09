@@ -468,11 +468,10 @@ void Grid3D::Initialize_Power_Spectrum_Measurements(int axis)
     } else {
       Analysis.ps_mean   = (Real *)malloc(n_bins * sizeof(Real));
       Analysis.k_centers = (Real *)malloc(n_bins * sizeof(Real));
-
+    }
       for (int bin_id = 0; bin_id < n_bins; bin_id++) {
         Analysis.k_centers[bin_id] = sqrt(Analysis.hist_k_edges_x[bin_id] * Analysis.hist_k_edges_x[bin_id + 1]);
       }
-    }
   }
 
   // if ( axis == 0 ){
@@ -577,6 +576,7 @@ void Grid3D::Compute_Flux_Power_Spectrum_Skewer(int skewer_id, int axis)
     {
       chprintf("\n\t F [%d] = %10f  & dF [%d] = %10f \n", los_id, skewers_transmitted_flux[skewer_id * n_los + los_id] , los_id, delta_F[los_id]);
     }
+  }
 
   // Compute the r2c FFT
   fftw_execute(fftw_plan);
