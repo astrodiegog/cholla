@@ -158,8 +158,8 @@ __global__ __launch_bounds__(TPB) void PLMC_cuda(Real *dev_conserved, Real *dev_
 
   #ifdef SCALAR
   for (int i = 0; i < NSCALARS; i++) {
-    interface_R_imh.scalar[i] = interface_R_imh.scalar[i] + qx * del_m_i.scalar[i];
-    interface_L_iph.scalar[i] = interface_L_iph.scalar[i] - qx * del_m_i.scalar[i];
+    interface_R_imh.scalar_specific[i] = interface_R_imh.scalar_specific[i] + qx * del_m_i.scalar_specific[i];
+    interface_L_iph.scalar_specific[i] = interface_L_iph.scalar_specific[i] - qx * del_m_i.scalar_specific[i];
   }
   #endif  // SCALAR
 
@@ -196,7 +196,7 @@ __global__ __launch_bounds__(TPB) void PLMC_cuda(Real *dev_conserved, Real *dev_
   #endif  // DE
   #ifdef SCALAR
     for (int i = 0; i < NSCALARS; i++) {
-      sum_scalar[i] += lamdiff * del_m_i.scalar[i];
+      sum_scalar[i] += lamdiff * del_m_i.scalar_specific[i];
     }
   #endif  // SCALAR
   }
@@ -220,7 +220,7 @@ __global__ __launch_bounds__(TPB) void PLMC_cuda(Real *dev_conserved, Real *dev_
   #endif  // DE
   #ifdef SCALAR
   for (int i = 0; i < NSCALARS; i++) {
-    interface_L_iph.scalar[i] += 0.5 * dtodx * sum_scalar[i];
+    interface_L_iph.scalar_specific[i] += 0.5 * dtodx * sum_scalar[i];
   }
   #endif  // SCALAR
 
@@ -253,7 +253,7 @@ __global__ __launch_bounds__(TPB) void PLMC_cuda(Real *dev_conserved, Real *dev_
   #endif  // DE
   #ifdef SCALAR
     for (int i = 0; i < NSCALARS; i++) {
-      sum_scalar[i] += lamdiff * del_m_i.scalar[i];
+      sum_scalar[i] += lamdiff * del_m_i.scalar_specific[i];
     }
   #endif  // SCALAR
   }
@@ -277,7 +277,7 @@ __global__ __launch_bounds__(TPB) void PLMC_cuda(Real *dev_conserved, Real *dev_
   #endif  // DE
   #ifdef SCALAR
   for (int i = 0; i < NSCALARS; i++) {
-    interface_R_imh.scalar[i] += 0.5 * dtodx * sum_scalar[i];
+    interface_R_imh.scalar_specific[i] += 0.5 * dtodx * sum_scalar[i];
   }
   #endif  // SCALAR
 #endif    // CTU
