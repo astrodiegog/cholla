@@ -136,7 +136,7 @@ __device__ Real Get_Cooling_Rates(Thermal_State &TS, ChemistryHeader &Chem_H, Re
   cool_ceHeII = interpolate_rate(Chem_H.cool_ceHeII_d, temp_indx, delta_T) * TS.d_HeII * TS.d_e / 4.0;
   U_dot -= cool_ceHI + cool_ceHeI + cool_ceHeII;
 
-  // Collisional excitation cooling
+  // Collisional ionization cooling
   Real cool_ciHI, cool_ciHeI, cool_ciHeII, cool_ciHeIS;
   cool_ciHI   = interpolate_rate(Chem_H.cool_ciHI_d, temp_indx, delta_T) * TS.d_HI * TS.d_e;
   cool_ciHeI  = interpolate_rate(Chem_H.cool_ciHeI_d, temp_indx, delta_T) * TS.d_HeI * TS.d_e / 4.0;
