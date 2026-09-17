@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # this is a 2-stage build
 
 ARG SOURCE_IMAGE="rocm/dev-ubuntu-22.04:5.5.1"
@@ -33,6 +34,9 @@ RUN python /tmp/scripts/get_clang_tidy.py \
 # ===========================================================
 FROM ${SOURCE_IMAGE}
 
+=======
+FROM rocm/dev-ubuntu-20.04:5.5.1
+>>>>>>> 191e59b063b4a4075738b0f016fd2203ab8b1523
 
 # Avoid annoying cmake -> tzdata install prompt
 ENV DEBIAN_FRONTEND=noninteractive
