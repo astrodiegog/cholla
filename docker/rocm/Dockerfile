@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # this is a 2-stage build
 
 ARG SOURCE_IMAGE="rocm/dev-ubuntu-22.04:5.5.1"
@@ -40,10 +41,17 @@ FROM rocm/dev-ubuntu-20.04:5.5.1
 
 # Avoid annoying cmake -> tzdata install prompt
 ENV DEBIAN_FRONTEND=noninteractive
+=======
+
+# The version of ubuntu in the base image was picked for consistency
+# with the ubuntu version in the base image of the cuda image
+FROM rocm/dev-ubuntu-22.04:5.5.1
+>>>>>>> upstream/dev
 
 RUN apt-get -y update && apt-get -y install \
     cmake \
     git \
+    git-lfs \
     gnupg \
     hipfft \
     libgtest-dev \
@@ -52,7 +60,11 @@ RUN apt-get -y update && apt-get -y install \
     openmpi-bin \
     rocfft \
     software-properties-common \
-    wget
+    wget \
+    sudo
+
+# Initialize Git LFS configurations (only needed for dev-containters)
+RUN git lfs install
 
 # Needed to trick ROCm into thinking there's a GPU
 RUN echo "gfx90a" | sudo tee --append $(hipconfig -R)/bin/target.lst
@@ -60,21 +72,12 @@ RUN echo "gfx90a" | sudo tee --append $(hipconfig -R)/bin/target.lst
 # Install rocRand
 RUN apt-get -y install rocrand
 
-# Install Clang and Tools
-# RUN wget https://apt.llvm.org/llvm.sh && \
-#     chmod +x llvm.sh && \
-#     echo "\n" | ./llvm.sh 15 all && \
-#     find /usr/bin/ -name 'clang*15'  | sed -E 's/^(\/usr\/bin\/.*)(\-[0-9]*)$/ln -s -v \1\2 \1/' | xargs -d '\n' -n 1 bash -c
+## Install Clang and Tools
+ADD scripts /tmp/scripts
 
-# Copy clang installation into this container
-# -------------------------------------------
-# if we also wanted to install the clang compiler, we should just invoke:
-#COPY --from=builder /tmp/clang-install/ /usr/local/
-
-# in the current version, we perform the following
-COPY --from=builder /tmp/clang-install/include /usr/local/include
-COPY --from=builder /tmp/clang-install/bin/clang-tidy /usr/local/bin/clang-tidy
-COPY --from=builder /tmp/clang-install/bin/run-clang-tidy /usr/local/bin/run-clang-tidy
+# this ARG must be declared after the FROM command to perform substitution
+ARG TARGET_LLVM_VERSION="17"
+RUN python3 /tmp/scripts/get_clang_tidy.py --llvm-version=${TARGET_LLVM_VERSION}
 
 # Needed by Cholla Makefile
 ENV CHOLLA_MACHINE=github
