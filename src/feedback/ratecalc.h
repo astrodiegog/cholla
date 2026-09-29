@@ -4,6 +4,11 @@
 #ifdef O_HIP
   #include <hiprand/hiprand.h>
   #include <hiprand/hiprand_kernel.h>
+<<<<<<< HEAD
+=======
+  //#include <hiprand.h>
+  //#include <hiprand_kernel.h>
+>>>>>>> 22032f6f64655a3303ae95e56d60c11f0bd344df
 #else
   #include <curand.h>
   #include <curand_kernel.h>
