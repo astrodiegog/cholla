@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+FROM rocm/dev-ubuntu-20.04:5.5.1
+>>>>>>> 191e59b063b4a4075738b0f016fd2203ab8b1523
 
 # The version of ubuntu in the base image was picked for consistency
 # with the ubuntu version in the base image of the cuda image
