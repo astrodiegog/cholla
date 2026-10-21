@@ -3,6 +3,7 @@ ci:
 
 
 repos:
+<<<<<<< HEAD
 # there are some other useful hooks we could enable from here in the future
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v5.0.0
@@ -15,6 +16,8 @@ repos:
   - id: check-yaml
 
 
+=======
+>>>>>>> 191e59b063b4a4075738b0f016fd2203ab8b1523
 -   repo: https://github.com/pre-commit/mirrors-clang-format
     # unlike most pre-commit tools, the version of this repository exactly
     # matches the version of clang-format
@@ -24,6 +27,7 @@ repos:
         verbose: true
         types_or: [c++, c, cuda]
         args: ["-style=file", "--verbose"]
+<<<<<<< HEAD
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
   rev: v0.11.13
@@ -35,3 +39,5 @@ repos:
   # run the formatter
   - id: ruff-format
     types_or: [ python ] # <- (consider adding jupyter to the list)
+=======
+>>>>>>> 191e59b063b4a4075738b0f016fd2203ab8b1523
